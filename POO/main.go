@@ -32,6 +32,16 @@ func (c *ContaCorrente) depositar(valorDoDeposito float64) (float64, string) {
 	}
 }
 
+func (c *ContaCorrente) Transferir(valorDaTransferencia float64, contaDestino *ContaCorrente) bool {
+	if valorDaTransferencia < c.saldo && valorDaTransferencia > 0 {
+		c.sacar(valorDaTransferencia)
+		contaDestino.depositar(valorDaTransferencia)
+		return true
+	} else {
+		return false
+	}
+}
+
 func main() {
 
 	contaDoNeberson := ContaCorrente{
@@ -46,6 +56,10 @@ func main() {
 	fmt.Println(contaDoNeberson)
 	fmt.Println(contaDaBruna)
 
+	status := contaDoNeberson.Transferir(20, &contaDaBruna)
+
+	fmt.Println(status)
+
 	valorDoSaque := 50.0
 	fmt.Println(contaDoNeberson.sacar(valorDoSaque))
 
@@ -54,4 +68,7 @@ func main() {
 	saldoAtual, mensagem := contaDoNeberson.depositar(100)
 
 	fmt.Println(mensagem, "Saldo atual:", saldoAtual)
+
+	fmt.Println(contaDoNeberson)
+	fmt.Println(contaDaBruna)
 }
