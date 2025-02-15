@@ -1,25 +1,31 @@
 package main
 
 import (
+	"POO/clientes"
 	"POO/contas"
 	"fmt"
 )
 
 func main() {
+	clienteDoNeberson := clientes.Titular{Nome: "Neberson", CPF: "123.456.789-00", Profissao: "Desenvolvedor"}
 
 	contaDoNeberson := contas.ContaCorrente{
-		Titular:       "Neberson Andrade",
+		Titular:       clienteDoNeberson,
 		NumeroAgencia: 589,
 		NumeroConta:   123456,
-		Saldo:         125.5,
 	}
 
+	contaDoNeberson.Depositar(125.50)
+
+	clienteDaBruna := clientes.Titular{Nome: "Bruna", CPF: "123.456.789-00", Profissao: "Desenvolvedora"}
+
 	contaDaBruna := contas.ContaCorrente{
-		Titular:       "Bruna Andrade",
+		Titular:       clienteDaBruna,
 		NumeroAgencia: 222,
 		NumeroConta:   111222,
-		Saldo:         200,
 	}
+
+	contaDaBruna.Depositar(150)
 
 	fmt.Println(contaDoNeberson)
 	fmt.Println(contaDaBruna)
