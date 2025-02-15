@@ -6,6 +6,14 @@ import (
 	"fmt"
 )
 
+func PagarBoleto(conta verificarConta, valorDoBoleto float64) {
+	conta.Sacar(valorDoBoleto)
+}
+
+type verificarConta interface {
+	Sacar(valor float64) string
+}
+
 func main() {
 	clienteDoNeberson := clientes.Titular{Nome: "Neberson", CPF: "123.456.789-00", Profissao: "Desenvolvedor"}
 
@@ -45,4 +53,20 @@ func main() {
 
 	fmt.Println(contaDoNeberson)
 	fmt.Println(contaDaBruna)
+
+	clienteDoDenis := clientes.Titular{Nome: "Denis", CPF: "987.654.321-00", Profissao: "Programador"}
+
+	contaDoDenis := contas.ContaPoupanca{
+		Titular:       clienteDoDenis,
+		NumeroAgencia: 589,
+		NumeroConta:   123456,
+	}
+
+	fmt.Println(contaDoDenis)
+
+	PagarBoleto(&contaDoDenis, 60)
+	fmt.Println(contaDoDenis)
+
+	PagarBoleto(&contaDoNeberson, 50)
+	fmt.Println(contaDoNeberson)
 }
