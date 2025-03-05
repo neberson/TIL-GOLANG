@@ -4,6 +4,7 @@ import (
 	"api-go-rest-gin/controllers"
 	"api-go-rest-gin/database"
 	"api-go-rest-gin/models"
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -109,4 +110,23 @@ func TestDeletaAlunoHandler(t *testing.T) {
 	resposta := httptest.NewRecorder()
 	r.ServeHTTP(resposta, req)
 	assert.Equal(t, http.StatusOK, resposta.Code)
+}
+
+func TestEditaUmAlunoHandle(t *testing.T) {
+	database.ConectaComBancoDeDados()
+	CriaAlunoMock()
+	defer DeletaAlunoMock()
+	r := SetupDasRotasDeTeste()
+	r.PATCH("/alunos/:id", controllers.EditaAluno)
+	aluno := models.Aluno{Nome: "Nome do Aluno Teste", Cpf: "12345678901", RG: "123456789"}
+	valorJson, _ := json.Marshal(aluno)
+	pathAlteracao := "/alunos/" + strconv.Itoa(ID)
+	req, _ := http.NewRequest("PATCH", pathAlteracao, bytes.NewBuffer(valorJson))
+	resposta := httptest.NewRecorder()
+	r.ServeHTTP(resposta, req)
+	var alunoMockAtualizado models.Aluno
+	json.Unmarshal(resposta.Body.Bytes(), &alunoMockAtualizado)
+	assert.Equal(t, "Nome do Aluno Teste", alunoMockAtualizado.Nome, "Os nomes devevem ser iguais")
+	assert.Equal(t, "12345678901", alunoMockAtualizado.Cpf)
+	assert.Equal(t, "123456789", alunoMockAtualizado.RG)
 }
