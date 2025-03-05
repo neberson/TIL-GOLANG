@@ -4,9 +4,11 @@ import (
 	"api-go-rest-gin/controllers"
 	"api-go-rest-gin/database"
 	"api-go-rest-gin/models"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -45,7 +47,7 @@ func TestVerificaStatusCodeDaSaudacaoComParametroAssert(t *testing.T) {
 var ID int
 
 func CriaAlunoMock() {
-	aluno := models.Aluno{Nome: "Neb", Cpf: "12345678901", RG: "123456789"}
+	aluno := models.Aluno{Nome: "AlunoTeste", Cpf: "12345678901", RG: "123456789"}
 	database.DB.Create(&aluno)
 	ID = int(aluno.ID)
 }
@@ -76,5 +78,23 @@ func TestBuscaAlunoPorCpf(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/alunos/cpf/12345678901", nil)
 	resposta := httptest.NewRecorder()
 	r.ServeHTTP(resposta, req)
+	assert.Equal(t, http.StatusOK, resposta.Code)
+}
+
+func TestBuscaAlunoPorIDHandler(t *testing.T) {
+	database.ConectaComBancoDeDados()
+	CriaAlunoMock()
+	defer DeletaAlunoMock()
+	r := SetupDasRotasDeTeste()
+	r.GET("/alunos/:id", controllers.BuscaAlunoPorId)
+	pathBusca := "/alunos/" + strconv.Itoa(ID)
+	req, _ := http.NewRequest("GET", pathBusca, nil)
+	resposta := httptest.NewRecorder()
+	r.ServeHTTP(resposta, req)
+	var alunoMock models.Aluno
+	json.Unmarshal(resposta.Body.Bytes(), &alunoMock)
+	assert.Equal(t, "AlunoTeste", alunoMock.Nome, "Os nomes devevem ser iguais")
+	assert.Equal(t, "12345678901", alunoMock.Cpf)
+	assert.Equal(t, "123456789", alunoMock.RG)
 	assert.Equal(t, http.StatusOK, resposta.Code)
 }
